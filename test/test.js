@@ -36,19 +36,11 @@ exports.request = testCase({
     });
   },
 
-  options: function(assert) {
+  'options.url': function(assert) {
     var options = {
       url : 'http://localhost:'+this.port
     };
     io.request(options, function(err, response) {
-      assert.equal(200, response.statusCode);
-      assert.equal('Boo', response.body);
-      assert.done();
-    });
-  },
-  
-  get: function(assert) {
-    io.request('http://localhost:'+this.port, function(err, response) {
       assert.equal(200, response.statusCode);
       assert.equal('Boo', response.body);
       assert.done();
