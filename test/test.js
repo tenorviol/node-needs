@@ -8,8 +8,9 @@ exports['test get'] = function(assert) {
       res.end('Boo');
     });
   
-  server.listen(3000, function() {
-    io.get('http://localhost:3000/', function(err, response) {
+  var port = 3000;
+  server.listen(port, function() {
+    io.get('http://localhost:'+port+'/', function(err, response) {
       server.close();
       assert.equal(200, response.statusCode);
       assert.equal('Boo', response.body);
