@@ -12,6 +12,12 @@ io
 
 ### request
 
+url : url
+type : 'GET' | 'POST' | 'PUT' | 'DELETE'
+data : 
+timeout : 
+username : TODO
+password : TODO
 
 
 ### serverTest
