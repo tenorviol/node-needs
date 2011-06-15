@@ -82,7 +82,7 @@ exports['serverTest'] = function(assert) {
       res.end('Boo');
     });
   
-  io.serverTest(server, function(result) {
+  io.serverTest(server, function(err, result) {
     assert.equal(200, result.statusCode);
     assert.equal('Boo', result.body);
     assert.done();
