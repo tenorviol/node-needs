@@ -76,7 +76,7 @@ exports.request = testCase({
   }
 });
 
-exports['serverTest'] = function(assert) {
+exports.serverTest = function(assert) {
   var server = connect()
     .use(function(req, res, next) {
       res.end('Boo');
