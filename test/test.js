@@ -91,6 +91,17 @@ module.exports = {
     }
   },
   
+  'url get w/querystring and options.data' : {
+    args : [
+      '/query?foo=foo',
+      { data: { foo:'bar', answer:42 } }
+    ],
+    expect : {
+      url : '/query?foo=foo&' + querystring.stringify({ foo:'bar', answer:42 }),
+      query : { foo: ['foo', 'bar'], answer:42 }
+    }
+  },
+  
   post: {
     args : [ {
         url  : '/',
@@ -99,6 +110,19 @@ module.exports = {
       }
     ],
     expect : {
+      post : { foo:'bar', answer:42 }
+    }
+  },
+  
+  'post w/querystring': {
+    args : [ {
+        url  : '/submit?id=300',
+        method : 'POST',
+        data : { foo:'bar', answer:42 }
+      }
+    ],
+    expect : {
+      query : { id:300 },
       post : { foo:'bar', answer:42 }
     }
   },
