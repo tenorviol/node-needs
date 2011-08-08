@@ -6,13 +6,13 @@ net
 
 ### get
 
-    io.get(url, data, function (err, response) {
+    net.get(url, data, function (err, response) {
       console.log(response);
     });
 
 ### post
 
-    io.post(url, data, function (err, response) {
+    net.post(url, data, function (err, response) {
         console.log(response);
     });
 
