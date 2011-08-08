@@ -107,14 +107,42 @@ tests.forEach(function (test) {
   test.expect.method = method;
   test.expect.url = test.expect.url || test.url;
   
-  var name = method + ' ' + url + ' ' + querystring.stringify(data);
-  
+  var options = { method: method, data: data };
+  var name = 'net.request(' + JSON.stringify(url) + ',' + JSON.stringify(options) + ')';
   module.exports[name] = function (assert) {
-    net.request(url, { method: method, data: data }, function (err, response) {
+    net.request(url, options, function (err, response) {
       assertResult(assert, err, response);
     });
   };
-
+  
+  if (method === 'GET') {
+    var options = { data: data };
+    var name = 'net.request(' + JSON.stringify(url) + ',' + JSON.stringify(options) + ')';
+    module.exports[name] = function (assert) {
+      net.request(url, options, function (err, response) {
+        assertResult(assert, err, response);
+      });
+    };
+  }
+  
+  if (!test.data) {
+    var options = { method: method };
+    var name = 'net.request(' + JSON.stringify(url) + ',' + JSON.stringify(options) + ')';
+    module.exports[name] = function (assert) {
+      net.request(url, options, function (err, response) {
+        assertResult(assert, err, response);
+      });
+    };
+  }
+  
+  var fn = method.toLowerCase();
+  var name = 'net.'+fn+'(' + JSON.stringify(url) + ',' + JSON.stringify(test.data) + ')';
+  module.exports[name] = function (assert) {
+    net[fn](url, test.data, function (err, response) {
+      assertResult(assert, err, response);
+    });
+  };
+  
   function assertResult(assert, err, response) {
     assert.equal(200, response.statusCode);
     
