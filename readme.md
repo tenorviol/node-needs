@@ -1,24 +1,37 @@
 Node Needs...
 =============
 
-io
---
+net
+---
 
 ### get
 
-    io.get('http://google.com', function(err, response) {
+    io.get(url, data, function (err, response) {
       console.log(response);
+    });
+
+### post
+
+    io.post(url, data, function (err, response) {
+        console.log(response);
     });
 
 ### request
 
-url : url
-type : 'GET' | 'POST' | 'PUT' | 'DELETE'
-data : 
-timeout : 
-username : TODO
-password : TODO
+    net.request(url, options, function (err, response) {
+        
+    });
 
+#### options
 
-### serverTest
+    {
+      url : url
+      method : 'GET' | 'POST' | 'PUT' | 'DELETE'
+      data : {}
+    }
 
+#### TODO options
+
+    timeout  // max time to wait
+    username // http simple auth
+    password // http simple auth
