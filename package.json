@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "author": "Chris Johnson <tenorviol@yahoo.com>",
   "devDependencies": {
-    "connect": ">= 2.0.0",
+    "connect": ">= 2.0.0"
   },
   "repository": "git://github.com/tenorviol/node-needs",
   "main": "index",
