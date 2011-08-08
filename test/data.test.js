@@ -1,7 +1,7 @@
 var data = require('../index').data;
 
-exports.test = function (assert) {
-  var c = new data.Collection();
+exports.testCollection = function (assert) {
+  var c = new data.ArrayCollection();
   
   var o1 = { _id:1, foo: 'bar' };
   c.add(o1);
