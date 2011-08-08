@@ -136,12 +136,21 @@ tests.forEach(function (test) {
   }
   
   var fn = method.toLowerCase();
-  var name = 'net.'+fn+'(' + JSON.stringify(url) + ',' + JSON.stringify(test.data) + ')';
-  module.exports[name] = function (assert) {
-    net[fn](url, test.data, function (err, response) {
-      assertResult(assert, err, response);
-    });
-  };
+  if (test.data) {
+    var name = 'net.'+fn+'(' + JSON.stringify(url) + ',' + JSON.stringify(test.data) + ')';
+    module.exports[name] = function (assert) {
+      net[fn](url, test.data, function (err, response) {
+        assertResult(assert, err, response);
+      });
+    };
+  } else {
+    var name = 'net.'+fn+'(' + JSON.stringify(url) + ')';
+    module.exports[name] = function (assert) {
+      net[fn](url, function (err, response) {
+        assertResult(assert, err, response);
+      });
+    };
+  }
   
   function assertResult(assert, err, response) {
     assert.equal(200, response.statusCode);
@@ -155,6 +164,13 @@ tests.forEach(function (test) {
     assert.done();
   }
 });
+
+exports.testNoCallback = function (assert) {
+  net.post('http://localhost:'+port+'/', { foo:'bar' });
+  setTimeout(function () {
+    assert.done();
+  }, 100);
+};
 
 // shutdown the test server
 exports.tearDownServer = function (assert) {
