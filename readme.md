@@ -13,13 +13,13 @@ net
 ### post
 
     net.post(url, data, function (err, response) {
-        console.log(response);
+      console.log(response);
     });
 
 ### request
 
     net.request(url, options, function (err, response) {
-        
+      console.log(response);
     });
 
 #### options
@@ -32,6 +32,7 @@ net
 
 #### TODO options
 
-    timeout  // max time to wait
+    timeout  // max time to wait (default?)
     username // http simple auth
     password // http simple auth
+    content type // e.g. json
