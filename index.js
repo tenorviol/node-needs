@@ -1,1 +1,1 @@
-exports.io = require('./lib/io');
+exports.net = require('./lib/net');

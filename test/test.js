@@ -20,17 +20,15 @@
  * THE SOFTWARE.
  */
 
-var io = require('../lib/io'),
+var net = require('../index').net,
     connect = require('connect'),
     querystring = require('querystring');
 
 var port = 3000;
 var server;
 
-module.exports = {
-  
-  // create a server for all tests to query
-  setUp: function (assert) {
+// create a server for all tests to query
+exports.setUpServer = function (assert) {
     server = connect()
       .use(connect.bodyParser())
       .use(function (req, res) {
@@ -46,129 +44,75 @@ module.exports = {
     server.listen(port, function () {
       assert.done();
     });
+};
+  
+var tests = [  
+  {
+    url : '/'+Math.random()
   },
   
-  // each of the following test objects will get
-  // rewritten into a nodeunit test function below
-  
-  url : {
-    args : [ '/'+Math.random() ]
-  },
-  
-  'url w/querystring' : {
-    args : [ '/query?' + querystring.stringify({ foo:'bar', answer:42 }) ],
+  {
+    url : '/query?' + querystring.stringify({ foo:'bar', answer:42 }),
     expect : {
       query : { foo:'bar', answer:42 }
     }
   },
   
-  'options.url' : {
-    args : [ { url : '/needs/of/the/many' } ]
-  },
-  
-  'url w/data' : {
-    args : [
-      '/query',
-      { data: { foo:'bar', answer:42 } }
-    ],
+  {
+    url : '/query',
+    data : { foo:'bar', answer:42 },
     expect : {
       url : '/query?' + querystring.stringify({ foo:'bar', answer:42 }),
       query : { foo:'bar', answer:42 }
     }
   },
   
-  'options.url get w/data': {
-    args : [
-      {
-        url  : '/query',
-        method : 'GET',
-        data : { foo:'bar', answer:42 }
-      }
-    ],
-    expect : {
-      url : '/query?' + querystring.stringify({ foo:'bar', answer:42 }),
-      query : { foo:'bar', answer:42 }
-    }
-  },
-  
-  'url get w/querystring and options.data' : {
-    args : [
-      '/query?foo=foo',
-      { data: { foo:'bar', answer:42 } }
-    ],
+  {
+    url : '/query?foo=foo',
+    data: { foo:'bar', answer:42 },
     expect : {
       url : '/query?foo=foo&' + querystring.stringify({ foo:'bar', answer:42 }),
       query : { foo: ['foo', 'bar'], answer:42 }
     }
   },
   
-  post: {
-    args : [ {
-        url  : '/',
-        method : 'POST',
-        data : { foo:'bar', answer:42 }
-      }
-    ],
+  {
+    url  : '/',
+    method : 'POST',
+    data : { foo:'bar', answer:42 },
     expect : {
       post : { foo:'bar', answer:42 }
     }
   },
   
-  'post w/querystring': {
-    args : [ {
-        url  : '/submit?id=300',
-        method : 'POST',
-        data : { foo:'bar', answer:42 }
-      }
-    ],
+  {
+    url  : '/submit?id=300',
+    method : 'POST',
+    data : { foo:'bar', answer:42 },
     expect : {
       query : { id:300 },
       post : { foo:'bar', answer:42 }
     }
-  },
-  
-  // shutdown the test server
-  tearDown: function (assert) {
-    server.close();
-    assert.done();
   }
-};
+];
 
-
-//
-// rewrite each { args, expect } test into a nodeunit test function
-//
-for (var key in module.exports) (function () {
-  var test = module.exports[key];
-  if (typeof test !== 'object') {
-    return;  // not an object, no rewrite
-  }
-  
+tests.forEach(function (test) {
   // add http:://localhost:port to the url, and store url/method for testing
-  var method = 'GET';
-  var url = '/';
-  for (var i in test.args) {
-    if (typeof test.args[i] === 'string') {
-      url = test.args[i];
-      test.args[i] = 'http://localhost:'+port + url;
-    } else if (typeof test.args[i] === 'object') {
-      method = test.args[i].method || method;
-      if (test.args[i].url) {
-        url = test.args[i].url;
-        test.args[i].url = 'http://localhost:'+port + url;
-      }
-    }
-  }
+  var url = 'http://localhost:' + port + test.url;
+  var method = test.method || 'GET';
+  var data = test.data || {};
   
   // these expectations will be asserted for
   test.expect = test.expect || {};
   test.expect.method = method;
-  test.expect.url = test.expect.url || url;
+  test.expect.url = test.expect.url || test.url;
   
-  // nodeunit test function
-  module.exports[key] = function (assert) {
-    // append an io request callback test function
-    test.args.push(function (err, response) {
+  var name = method + ' ' + url + ' ' + querystring.stringify(data);
+  
+  module.exports[name] = function (assert) {
+    net.request(url, { method: method, data: data }, assertResult);
+  
+    function assertResult(err, response) {
       assert.equal(200, response.statusCode);
       
       // the server response writes back testable data (see setUp function above)
@@ -178,12 +122,15 @@ for (var key in module.exports) (function () {
       }
       
       assert.done();
-    });
-    
-    // a request invokes the above test
-    io.request.apply({}, test.args);
+    }
   };
-})();
+});
+
+// shutdown the test server
+exports.tearDownServer = function (assert) {
+  server.close();
+  assert.done();
+};
 
 module.exports.serverTest = function (assert) {
   var server = connect()
@@ -191,7 +138,7 @@ module.exports.serverTest = function (assert) {
       res.end('Boo');
     });
   
-  io.serverTest(server, function(err, result) {
+  net.serverTest(server, function(err, result) {
     assert.equal(200, result.statusCode);
     assert.equal('Boo', result.body);
     assert.done();
