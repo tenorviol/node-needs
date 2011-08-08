@@ -110,20 +110,22 @@ tests.forEach(function (test) {
   var name = method + ' ' + url + ' ' + querystring.stringify(data);
   
   module.exports[name] = function (assert) {
-    net.request(url, { method: method, data: data }, assertResult);
-  
-    function assertResult(err, response) {
-      assert.equal(200, response.statusCode);
-      
-      // the server response writes back testable data (see setUp function above)
-      var parse = JSON.parse(response.body);
-      for (var i in test.expect) {
-        assert.deepEqual(test.expect[i], parse[i]);
-      }
-      
-      assert.done();
-    }
+    net.request(url, { method: method, data: data }, function (err, response) {
+      assertResult(assert, err, response);
+    });
   };
+
+  function assertResult(assert, err, response) {
+    assert.equal(200, response.statusCode);
+    
+    // the server response writes back testable data (see setUp function above)
+    var parse = JSON.parse(response.body);
+    for (var i in test.expect) {
+      assert.deepEqual(test.expect[i], parse[i]);
+    }
+    
+    assert.done();
+  }
 });
 
 // shutdown the test server
