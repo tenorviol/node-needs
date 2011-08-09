@@ -93,6 +93,24 @@ var tests = [
       query : { id:300 },
       post : { foo:'bar', answer:42 }
     }
+  },
+  
+  {
+    url : '/photo',
+    method : 'PUT',
+    data : { foo:'bar', answer:42 },
+    expect : {
+      post : { foo:'bar', answer:42 }
+    }
+  },
+  
+  {
+    url : '/photo',
+    method : 'DELETE',
+    data : { id:42 },
+    expect : {
+      post : { id:42 }
+    }
   }
 ];
 
