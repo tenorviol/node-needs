@@ -4,17 +4,16 @@ Node Needs...
 net
 ---
 
-### get
+### get, post, put, delete
 
-    net.get(url, data, function (err, response) {
+    net.get(url, data, onResponse);
+    net.post(url, data, onResponse);
+    net.put(url, data, onResponse);
+    net.delete(url, data, onResponse);
+
+    function onResponse (err, response) {
       console.log(response);
-    });
-
-### post
-
-    net.post(url, data, function (err, response) {
-      console.log(response);
-    });
+    }
 
 ### request
 
