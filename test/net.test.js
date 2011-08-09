@@ -196,15 +196,9 @@ exports.tearDownServer = function (assert) {
   assert.done();
 };
 
-module.exports.serverTest = function (assert) {
-  var server = connect()
-    .use(function(req, res, next) {
-      res.end('Boo');
-    });
-  
-  net.serverTest(server, function(err, result) {
-    assert.equal(200, result.statusCode);
-    assert.equal('Boo', result.body);
+exports.testGoogle = function (assert) {
+  net.get('http://www.google.com', function (err, response) {
+    assert.ok(response.body.indexOf('Google') > -1);
     assert.done();
   });
 };
