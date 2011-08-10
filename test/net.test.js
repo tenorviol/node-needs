@@ -28,24 +28,28 @@ var port = 3000;
 var server;
 
 // create a server for all tests to query
-exports.setUpServer = function (assert) {
-    server = connect()
-      .use(connect.bodyParser())
-      .use(function (req, res) {
-        var parse = require('url').parse(req.url, true);
-        var response = {
-          url    : req.url,
-          method : req.method,
-          query  : parse.query,
-          post   : req.body
-        };
-        res.end(JSON.stringify(response));
-      });
-    server.listen(port, function () {
-      assert.done();
+exports.setUpHttpServer = function (assert) {
+  server = connect()
+    .use(connect.bodyParser())
+    .use(function (req, res) {
+      var parse = require('url').parse(req.url, true);
+      var response = {
+        url    : req.url,
+        method : req.method,
+        query  : parse.query,
+        post   : req.body
+      };
+      res.end(JSON.stringify(response));
     });
+  server.listen(port, function () {
+    assert.done();
+  });
 };
-  
+
+exports.setUpHttpsServer = function (assert) {
+  assert.done();
+};
+
 var tests = [  
   {
     url : '/'+Math.random()
@@ -191,8 +195,12 @@ exports.testNoCallback = function (assert) {
 };
 
 // shutdown the test server
-exports.tearDownServer = function (assert) {
+exports.tearDownHttpServer = function (assert) {
   server.close();
+  assert.done();
+};
+
+exports.tearDownHttpsServer = function (assert) {
   assert.done();
 };
 
