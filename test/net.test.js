@@ -22,10 +22,13 @@
 
 var net = require('../index').net,
     connect = require('connect'),
+    fs = require('fs'),
     querystring = require('querystring');
 
 var port = 3000;
 var server;
+var https_port = 3001;
+var https_server;
 
 // create a server for all tests to query
 exports.setUpHttpServer = function (assert) {
@@ -47,7 +50,26 @@ exports.setUpHttpServer = function (assert) {
 };
 
 exports.setUpHttpsServer = function (assert) {
-  assert.done();
+  var options = {
+    key: fs.readFileSync(__dirname + '/fixtures/ssl.key'),
+    cert: fs.readFileSync(__dirname + '/fixtures/ssl.crt')
+  };
+  https_server = connect(options)
+    .use(connect.bodyParser())
+    .use(function (req, res) {
+      var parse = require('url').parse(req.url, true);
+      var response = {
+        https  : true,
+        url    : req.url,
+        method : req.method,
+        query  : parse.query,
+        post   : req.body
+      };
+      res.end(JSON.stringify(response));
+    });
+  https_server.listen(https_port, function () {
+    assert.done();
+  });
 };
 
 var tests = [  
@@ -129,6 +151,7 @@ tests.forEach(function (test) {
   test.expect.method = method;
   test.expect.url = test.expect.url || test.url;
   
+  // test most explicit request
   var options = { method: method, data: data };
   var name = 'net.request(' + JSON.stringify(url) + ',' + JSON.stringify(options) + ')';
   module.exports[name] = function (assert) {
@@ -137,6 +160,7 @@ tests.forEach(function (test) {
     });
   };
   
+  // test request without method
   if (method === 'GET') {
     var options = { data: data };
     var name = 'net.request(' + JSON.stringify(url) + ',' + JSON.stringify(options) + ')';
@@ -147,6 +171,7 @@ tests.forEach(function (test) {
     };
   }
   
+  // test request with method but no data
   if (!test.data) {
     var options = { method: method };
     var name = 'net.request(' + JSON.stringify(url) + ',' + JSON.stringify(options) + ')';
@@ -157,6 +182,7 @@ tests.forEach(function (test) {
     };
   }
   
+  // test named method request
   var fn = method.toLowerCase();
   if (test.data) {
     var name = 'net.'+fn+'(' + JSON.stringify(url) + ',' + JSON.stringify(test.data) + ')';
@@ -173,6 +199,17 @@ tests.forEach(function (test) {
       });
     };
   }
+  
+  // test https
+  var url = 'https://localhost:' + https_port + test.url;
+  var options = { method: method, data: data };
+  var name = 'net.request(' + JSON.stringify(url) + ',' + JSON.stringify(options) + ')';
+  module.exports[name] = function (assert) {
+    net.request(url, options, function (err, response) {
+      assert.ok(response.body.indexOf('"https":true') > -1);
+      assertResult(assert, err, response);
+    });
+  };
   
   function assertResult(assert, err, response) {
     assert.equal(200, response.statusCode);
@@ -201,12 +238,20 @@ exports.tearDownHttpServer = function (assert) {
 };
 
 exports.tearDownHttpsServer = function (assert) {
+  https_server.close();
   assert.done();
 };
 
 exports.testGoogle = function (assert) {
   net.get('http://www.google.com', function (err, response) {
     assert.ok(response.body.indexOf('Google') > -1);
+    assert.done();
+  });
+};
+
+exports.testFacebookHttps = function (assert) {
+  net.get('https://graph.facebook.com/4', function (err, response) {
+    assert.ok(response.body.indexOf('Zuckerberg') > -1);
     assert.done();
   });
 };
