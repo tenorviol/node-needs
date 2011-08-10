@@ -18,7 +18,7 @@ exports.testArrayCollection = function (assert) {
   c.add(1000000, o3);
   assert.equal(o3, c.get(1000000));
   
-  c.remove(1000000);
+  c['delete'](1000000);
   try {
     c.get(1000000);
     assert.ok(false);
