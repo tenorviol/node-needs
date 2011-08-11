@@ -1,11 +1,11 @@
-var data = require('../index').data;
+var Collection = require('../index').collection;
 
 [
   'ArrayCollection',
   'ObjectCollection'
 ].forEach(function (type) {
   exports['test ' + type] = function (assert) {
-    var collection = new data[type];
+    var collection = new Collection[type];
     
     // add object 1
     var k1 = 1;
