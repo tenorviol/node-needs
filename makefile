@@ -7,4 +7,5 @@ nodeunit:
 docs: docco
 
 docco:
+	rm -rf docs
 	docco lib/*.js
