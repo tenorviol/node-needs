@@ -35,3 +35,4 @@ net
     username // http simple auth
     password // http simple auth
     content type // e.g. json
+    agent    // handling concurrency
